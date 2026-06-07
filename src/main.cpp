@@ -27,7 +27,10 @@ int main(int argc, char* argv[]) {
 
     const std::string mode(argv[1]);
     const std::string input_file(argv[2]);
-    const std::string output_file{ std::string(argv[2]) + ".encrypted"};
+    const std::string output_file{
+        mode == "encrypt" ?
+        std::string(argv[2]) + ".encrypted" :
+        std::string(argv[2]) + ".decrypted"};
 
     if (mode != "encrypt" && mode != "decrypt") {
         LOG("Unknown mode: " << mode << '\n');
@@ -39,7 +42,7 @@ int main(int argc, char* argv[]) {
 
     std::ifstream in;
     std::ofstream out;
-    //Errors during file handling are the most common. Hence, I decided to try catch this block.
+    //Errors during file handling are the most common. Hence, I decided to try catch this block. Files could throw exceptions in the rest of the code as well.
     try {
         in = std::ifstream(input_file, std::ios::binary);
         if (!in) throw std::runtime_error("Cannot open input file: " + input_file);
@@ -52,11 +55,12 @@ int main(int argc, char* argv[]) {
     }
     if (mode == "encrypt") {
         crypto::encrypt_file(std::move(in), std::move(out), password);
+        LOG("Encrypted: " << input_file << " into " << output_file);
     } else {
         crypto::decrypt_file(std::move(in), std::move(out), password);
+        LOG("Decrypted: " << input_file << " into " << output_file);
     }
     // Securely wipe password from memory
     sodium_memzero(password.data(), password.size());
-
     return 0;
 }

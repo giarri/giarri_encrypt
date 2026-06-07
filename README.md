@@ -33,3 +33,12 @@ of the most critical operations (password reading, encryption and decryption ope
 Effective usage of the latest C++ standards would be appreciated (at least C++11).
 
 The C++ applications must be built using at least a basic Makefile, but using a CMake file would be appreciated.
+
+## BUILD AND RUN
+```shell
+mkdir build
+cmake -S . build
+cd build
+make
+./giarri_encrypt encrypt ../CMakeLists.txt
+```

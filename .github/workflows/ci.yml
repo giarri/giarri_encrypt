@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.os }} / ${{ matrix.build_type }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        build_type: [Release]
+
+    steps:
+      # ── Checkout ────────────────────────────────────────────────────────────
+      - uses: actions/checkout@v4
+
+      # ── Dependencies ────────────────────────────────────────────────────────
+      - name: Install libsodium (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libsodium-dev pkg-config
+
+      - name: Install libsodium (macOS)
+        if: runner.os == 'macOS'
+        run: brew install libsodium pkg-config
+
+      - name: Install libsodium (Windows)
+        if: runner.os == 'Windows'
+        run: vcpkg install libsodium:x64-windows
+        # Assumes VCPKG_ROOT is set by the runner; windows-latest has vcpkg pre-installed.
+
+      # ── Configure ───────────────────────────────────────────────────────────
+      - name: Configure (Linux / macOS)
+        if: runner.os != 'Windows'
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cmake -B build `
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+      # ── Build ────────────────────────────────────────────────────────────────
+      - name: Build
+        run: cmake --build build --config ${{ matrix.build_type }} --parallel
+
+      # ── Test ─────────────────────────────────────────────────────────────────
+      - name: Run tests
+        working-directory: build
+        run: ctest --build-config ${{ matrix.build_type }} --output-on-failure --parallel 4

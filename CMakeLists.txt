@@ -13,15 +13,16 @@ add_compile_options(
     -D_FORTIFY_SOURCE=2
     -Wformat -Wformat-security
 )
+
+find_package(PkgConfig REQUIRED)
 if(UNIX AND NOT APPLE)
     add_link_options(-Wl,-z,relro,-z,now)
-	pkg_check_modules(pty REQUIRED)
+	pkg_check_modules(pty REQUIRED libpty)
 elseif(APPLE)
-    add_link_options(-Wl, -lutil)
+    add_link_options(-Wl)
 endif()
 
 # ── Dependencies ─────────────────────────────────────────────────────────────
-find_package(PkgConfig REQUIRED)
 pkg_check_modules(SODIUM REQUIRED libsodium)
 
 # ── Library (shared between main and tests) ───────────────────────────────────

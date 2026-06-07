@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <chrono>
+#include <cstring>
 
 #ifdef __APPLE__
 #  include <util.h>
@@ -95,6 +96,7 @@ protected:
     int master_fd = -1, slave_fd = -1;
 
     void SetUp() override {
+        ASSERT_GE(sodium_init(), 0);
         ASSERT_EQ(openpty(&master_fd, &slave_fd, nullptr, nullptr, nullptr), 0)
             << "openpty failed: " << strerror(errno);
 

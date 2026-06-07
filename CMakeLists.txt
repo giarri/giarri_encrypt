@@ -17,7 +17,6 @@ add_compile_options(
 find_package(PkgConfig REQUIRED)
 if(UNIX AND NOT APPLE)
     add_link_options(-Wl,-z,relro,-z,now)
-	pkg_check_modules(pty REQUIRED libpty)
 elseif(APPLE)
     add_link_options(-Wl)
 endif()
@@ -53,6 +52,9 @@ target_link_libraries(giarri_encrypt_tests PRIVATE
 	GTest::gtest
 	GTest::gtest_main
 )
+if(UNIX AND NOT APPLE)
+    target_link_libraries(giarri_encrypt_tests PRIVATE util)
+endif()
 
 enable_testing()
 include(GoogleTest)

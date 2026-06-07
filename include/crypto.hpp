@@ -51,7 +51,7 @@ SecureKey derive_key(const std::string& password,
                      const uint8_t salt[SALT_SIZE]);
 
 /**
- * Encrypt plaintext → ciphertext.
+ * Encrypt input stream into output stream.
  * Generates a random salt each call.
  */
 void encrypt_file(std::ifstream in,
@@ -59,7 +59,7 @@ void encrypt_file(std::ifstream in,
                   const std::string& password);
 
 /**
- * Decrypt ciphertext → plaintext.
+ * Decrypt input stream into output stream.
  */
 void decrypt_file(std::ifstream in,
                   std::ofstream out,

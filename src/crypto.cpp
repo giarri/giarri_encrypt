@@ -14,6 +14,58 @@
 
 namespace crypto {
 
+    // ---------------------------------------------------------------------------
+    // Secure password input
+    // ---------------------------------------------------------------------------
+
+    std::string read_password(const std::string& prompt)
+    {
+        // Disable echo
+        struct termios old_tty{}, new_tty{};
+        const bool is_tty = (tcgetattr(STDIN_FILENO, &old_tty) == 0);
+        if (is_tty) {
+            new_tty = old_tty;
+            new_tty.c_lflag &= ~static_cast<tcflag_t>(ECHO);
+            tcsetattr(STDIN_FILENO, TCSANOW, &new_tty);
+        }
+
+        std::cerr << prompt << std::flush;
+
+        // Use a libsodium-allocated buffer to prevent swapping
+        constexpr size_t MAX_PW = 256;
+        char* buf = static_cast<char*>(sodium_malloc(MAX_PW));
+        if (!buf) throw std::runtime_error("sodium_malloc failed for password buffer");
+
+        std::string pw;
+        try {
+            // Read char-by-char to avoid leaving a copy in istream internals
+            char c = '\0';
+            size_t i = 0;
+            while (i < MAX_PW - 1 && std::cin.get(c) && c != '\n') {
+                buf[i++] = c;
+            }
+            buf[i] = '\0';
+            pw.assign(buf, i);
+        } catch (...) {
+            sodium_memzero(buf, MAX_PW);
+            sodium_free(buf);
+            if (is_tty) {
+                tcsetattr(STDIN_FILENO, TCSANOW, &old_tty);
+                std::cerr << '\n';
+            }
+            throw;
+        }
+
+        sodium_memzero(buf, MAX_PW);
+        sodium_free(buf);
+
+        if (is_tty) {
+            tcsetattr(STDIN_FILENO, TCSANOW, &old_tty);
+            std::cerr << '\n';
+        }
+        return pw;
+    }
+
 SecureKey derive_key(const std::string& password,
                      const uint8_t salt[SALT_SIZE])
 {
@@ -199,56 +251,5 @@ void decrypt_file(std::ifstream in,
     LOG("Decryption complete");
 }
 
-// ---------------------------------------------------------------------------
-// Secure password input
-// ---------------------------------------------------------------------------
 
-std::string read_password(const std::string& prompt)
-{
-    // Disable echo
-    struct termios old_tty{}, new_tty{};
-    const bool is_tty = (tcgetattr(STDIN_FILENO, &old_tty) == 0);
-    if (is_tty) {
-        new_tty = old_tty;
-        new_tty.c_lflag &= ~static_cast<tcflag_t>(ECHO);
-        tcsetattr(STDIN_FILENO, TCSANOW, &new_tty);
-    }
-
-    std::cerr << prompt << std::flush;
-
-    // Use a libsodium-allocated buffer to prevent swapping
-    constexpr size_t MAX_PW = 256;
-    char* buf = static_cast<char*>(sodium_malloc(MAX_PW));
-    if (!buf) throw std::runtime_error("sodium_malloc failed for password buffer");
-
-    std::string pw;
-    try {
-        // Read char-by-char to avoid leaving a copy in istream internals
-        char c = '\0';
-        size_t i = 0;
-        while (i < MAX_PW - 1 && std::cin.get(c) && c != '\n') {
-            buf[i++] = c;
-        }
-        buf[i] = '\0';
-        pw.assign(buf, i);
-    } catch (...) {
-        sodium_memzero(buf, MAX_PW);
-        sodium_free(buf);
-        if (is_tty) {
-            tcsetattr(STDIN_FILENO, TCSANOW, &old_tty);
-            std::cerr << '\n';
-        }
-        throw;
-    }
-
-    sodium_memzero(buf, MAX_PW);
-    sodium_free(buf);
-
-    if (is_tty) {
-        tcsetattr(STDIN_FILENO, TCSANOW, &old_tty);
-        std::cerr << '\n';
-    }
-    return pw;
-}
-
-} // namespace eglue
+} // namespace crypto

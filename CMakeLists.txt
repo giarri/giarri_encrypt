@@ -15,8 +15,9 @@ add_compile_options(
 )
 if(UNIX AND NOT APPLE)
     add_link_options(-Wl,-z,relro,-z,now)
+	pkg_check_modules(pty REQUIRED)
 elseif(APPLE)
-    add_link_options(-Wl)
+    add_link_options(-Wl, -lutil)
 endif()
 
 # ── Dependencies ─────────────────────────────────────────────────────────────

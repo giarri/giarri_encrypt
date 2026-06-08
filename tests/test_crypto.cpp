@@ -9,17 +9,19 @@
 #include <string>
 
 #ifdef _WIN32
-    #define NO_TERM
+    #define NO_TERM //skip the term test
 #else
-    #include <termios.h>
+    #ifdef __APPLE__
+        #include <util.h>
+    #else
+        #include <pty.h>
+        #include <termios.h>
+    #endif
 #endif
 #include <fcntl.h>
 #include <poll.h>
 #include <chrono>
 
-#ifdef __APPLE__
-#  include <util.h>
-#endif
 #include <unistd.h>   // write, close
 #include <thread>
 #include <sstream>

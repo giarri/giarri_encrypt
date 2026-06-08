@@ -8,10 +8,10 @@
 #include <fstream>
 #include <string>
 
-#ifdef TARGET_OS_WINDOWS
-#define NO_TERM
+#if defined(_WIN64) || defined(_WIN32)
+    #define NO_TERM
 #else
-#include <termios.h>
+    #include <termios.h>
 #endif
 #include <fcntl.h>
 #include <poll.h>

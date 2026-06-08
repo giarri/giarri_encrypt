@@ -40,6 +40,7 @@ mkdir build
 cmake -S . build
 cd build
 make
+# example use
 ./giarri_encrypt encrypt ../CMakeLists.txt
 ```
 

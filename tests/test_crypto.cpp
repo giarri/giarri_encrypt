@@ -93,6 +93,7 @@ static std::string drain(int master_fd, int timeout_ms = 200)
     return out;
 }
 
+#ifndef NO_TERM
 class PtyEchoTest : public ::testing::Test {
 protected:
     int master_fd = -1, slave_fd = -1;
@@ -124,7 +125,6 @@ TEST_F(PtyEchoTest, SlaveHasEchoEnabledByDefault)
         << "Expected default PTY to echo; got: " << echoed;
 }
 
-#ifndef NO_TERM
 TEST_F(PtyEchoTest, ReadPasswordDisablesEcho)
 {
     // ── 1. redirect STDIN_FILENO and std::cin to the slave ──────────────────

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11) #version of FetchContent_Declare
+cmake_minimum_required(VERSION 3.24) #version of FetchContent_Declare FIND_PACKAGE_ARGS 
 project(giarri_encrypt VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -7,12 +7,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew")
 
 # Hardening flags
-add_compile_options(
-    -Wall -Wextra -Wpedantic
-    -fstack-protector-strong
-    -D_FORTIFY_SOURCE=2
-    -Wformat -Wformat-security
-)
+if(NOT MSVC)
+    add_compile_options(
+        -Wall -Wextra -Wpedantic
+        -fstack-protector-strong
+        -D_FORTIFY_SOURCE=2
+        -Wformat -Wformat-security
+    )
+endif()
 
 find_package(PkgConfig REQUIRED)
 if(UNIX AND NOT APPLE)
@@ -40,6 +42,7 @@ include(FetchContent)
 FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz
+	FIND_PACKAGE_ARGS NAMES GTest
 )
 # Prevent GTest from overriding your compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)

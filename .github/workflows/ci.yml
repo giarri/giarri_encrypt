@@ -17,19 +17,12 @@ jobs:
 
     steps:
       # ── Checkout ────────────────────────────────────────────────────────────
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # ── Dependencies ────────────────────────────────────────────────────────
-      - name: Install libsodium (Linux)
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libsodium-dev pkg-config
-
-      - name: Install libsodium (macOS)
-        if: runner.os == 'macOS'
-        run: brew install libsodium pkg-config
-
       - name: Cache vcpkg
-        uses: actions/cache@v4
+        uses: actions/cache@v5
+        id: cache-vcpkg
         if: runner.os == 'Windows'
         with:
           path: |
@@ -43,24 +36,33 @@ jobs:
         run: echo "VCPKG_BINARY_SOURCES=clear;files,C:\Users\runneradmin\AppData\Local\vcpkg\archives,readwrite" >> $env:GITHUB_ENV
 
       - name: Install libsodium (Windows)
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' &&
+            steps.cache-vpkg.outputs.cache-hit != 'true'
         run: vcpkg install libsodium:x64-windows
 
+      - name: Install libsodium (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y libsodium-dev
+
+      # ── CMake dependency cache ────────────────────────────────────────────────
+      - name: Cache CMake build deps
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: gtest-1.14.0-${{ runner.os }}
+          restore-keys: gtest-${{ runner.os }}-
+
+
       # ── Configure ───────────────────────────────────────────────────────────
-      - name: Configure (Linux / macOS)
-        if: runner.os != 'Windows'
+      - name: Configure (macOS)
+        if: runner.os == 'macOS'
         run: |
           echo "PKG_CONFIG_PATH=$(brew --prefix libsodium)/lib/pkgconfig" >> $GITHUB_ENV
           echo "CMAKE_PREFIX_PATH=$(brew --prefix libsodium)" >> $GITHUB_ENV
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
-      - name: Debug libsodium paths
-        if: runner.os == 'macOS'
-        run: |
-          brew --prefix libsodium
-          pkg-config --libs --cflags libsodium
-          ls $(brew --prefix libsodium)/lib/
+      - name: Configure (Linux / macOS)
+        if: runner.os != 'Windows'
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
       - name: Configure (Windows)
         if: runner.os == 'Windows'
@@ -77,9 +79,3 @@ jobs:
       - name: Run tests
         working-directory: build
         run: ctest --build-config ${{ matrix.build_type }} --output-on-failure --parallel 4
-      
-      - name: Cache CMake build deps
-        uses: actions/cache@v4
-        with:
-          path: build/_deps
-          key: gtest-1.14.0-${{ runner.os }}

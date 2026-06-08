@@ -8,7 +8,11 @@
 #include <fstream>
 #include <string>
 
+#ifdef TARGET_OS_WINDOWS
+#define NO_TERM
+#else
 #include <termios.h>
+#endif
 #include <fcntl.h>
 #include <poll.h>
 #include <chrono>
@@ -16,8 +20,6 @@
 
 #ifdef __APPLE__
 #  include <util.h>
-#else
-#  include <pty.h>
 #endif
 #include <unistd.h>   // write, close
 #include <thread>
@@ -122,6 +124,7 @@ TEST_F(PtyEchoTest, SlaveHasEchoEnabledByDefault)
         << "Expected default PTY to echo; got: " << echoed;
 }
 
+#ifndef NO_TERM
 TEST_F(PtyEchoTest, ReadPasswordDisablesEcho)
 {
     // ── 1. redirect STDIN_FILENO and std::cin to the slave ──────────────────
@@ -165,6 +168,7 @@ TEST_F(PtyEchoTest, ReadPasswordDisablesEcho)
     EXPECT_TRUE(t.c_lflag & ECHO)
         << "ECHO flag was not restored on the slave after read_password returned";
 }
+#endif
 
 // ---------------------------------------------------------------------------
 // Encrypt / Decrypt round-trip tests

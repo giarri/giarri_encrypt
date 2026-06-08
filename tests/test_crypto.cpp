@@ -9,7 +9,7 @@
 #include <string>
 
 #ifdef _WIN32
-    #define NO_TERM //skip the term test
+    #define NO_TERMIMAL_TESTS
 #else
     #include <poll.h>
     #include <unistd.h>
@@ -75,10 +75,12 @@ TEST_F(KeyDerivationTest, DifferentPasswordsDifferentKeys) {
     EXPECT_NE(std::memcmp(k1.data(), k2.data(), crypto::KEY_SIZE), 0);
 }
 
+#ifndef NO_TERMIMAL_TESTS
 // ---------------------------------------------------------------------------
 // Password reading tests
 // ---------------------------------------------------------------------------
 // Drain the master fd for up to `timeout_ms`; returns whatever arrived.
+
 static std::string drain(int master_fd, int timeout_ms = 200)
 {
     std::string out;
@@ -94,7 +96,6 @@ static std::string drain(int master_fd, int timeout_ms = 200)
     return out;
 }
 
-#ifndef NO_TERM
 class PtyEchoTest : public ::testing::Test {
 protected:
     int master_fd = -1, slave_fd = -1;
@@ -169,7 +170,7 @@ TEST_F(PtyEchoTest, ReadPasswordDisablesEcho)
     EXPECT_TRUE(t.c_lflag & ECHO)
         << "ECHO flag was not restored on the slave after read_password returned";
 }
-#endif // NO_TERM
+#endif // NO_TERMIMAL_TESTS
 
 // ---------------------------------------------------------------------------
 // Encrypt / Decrypt round-trip tests

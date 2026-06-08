@@ -11,6 +11,8 @@
 #ifdef _WIN32
     #define NO_TERM //skip the term test
 #else
+    #include <poll.h>
+    #include <unistd.h>
     #ifdef __APPLE__
         #include <util.h>
     #else
@@ -19,10 +21,7 @@
     #endif
 #endif
 #include <fcntl.h>
-#include <poll.h>
 #include <chrono>
-
-#include <unistd.h>   // write, close
 #include <thread>
 #include <sstream>
 #include <cstring>

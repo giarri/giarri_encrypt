@@ -10,7 +10,7 @@ jobs:
     name: ${{ matrix.os }} / ${{ matrix.build_type }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         build_type: [Release]
@@ -37,8 +37,16 @@ jobs:
       - name: Configure (Linux / macOS)
         if: runner.os != 'Windows'
         run: |
+          echo "PKG_CONFIG_PATH=$(brew --prefix libsodium)/lib/pkgconfig" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=$(brew --prefix libsodium)" >> $GITHUB_ENV
           cmake -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+      - name: Debug libsodium paths
+        if: runner.os == 'macOS'
+        run: |
+          brew --prefix libsodium
+          pkg-config --libs --cflags libsodium
+          ls $(brew --prefix libsodium)/lib/
 
       - name: Configure (Windows)
         if: runner.os == 'Windows'

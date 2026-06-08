@@ -8,7 +8,7 @@
 #include <fstream>
 #include <string>
 
-#if defined(_WIN64) || defined(_WIN32)
+#ifdef _WIN32
     #define NO_TERM
 #else
     #include <termios.h>
@@ -16,7 +16,6 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <chrono>
-#include <cstring>
 
 #ifdef __APPLE__
 #  include <util.h>
@@ -168,7 +167,7 @@ TEST_F(PtyEchoTest, ReadPasswordDisablesEcho)
     EXPECT_TRUE(t.c_lflag & ECHO)
         << "ECHO flag was not restored on the slave after read_password returned";
 }
-#endif
+#endif // NO_TERM
 
 // ---------------------------------------------------------------------------
 // Encrypt / Decrypt round-trip tests

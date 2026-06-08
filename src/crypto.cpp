@@ -1,7 +1,9 @@
 #include "crypto.hpp"
 
 #include <sodium.h>
-#ifndef _WIN32
+#ifdef _WIN32
+    #include <windows.h>
+#else
     #include <termios.h>
     #include <unistd.h>
 #endif

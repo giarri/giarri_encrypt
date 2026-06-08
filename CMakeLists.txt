@@ -21,13 +21,10 @@ elseif(APPLE)
     add_link_options(-Wl)
 endif()
 
-# ── Dependencies ─────────────────────────────────────────────────────────────
-find_library(SODIUM_LIB sodium REQUIRED
-    HINTS /opt/homebrew/lib /usr/local/lib
-)
+# -- Dependencies -------------------------------------------------------------
 pkg_check_modules(SODIUM REQUIRED libsodium)
 
-# ── Library (shared between main and tests) ───────────────────────────────────
+# -- Library (shared between main and tests) -----------------------------------
 add_library(giarri_encrypt_lib STATIC src/crypto.cpp)
 target_include_directories(giarri_encrypt_lib PUBLIC include ${SODIUM_INCLUDE_DIRS})
 target_link_libraries(giarri_encrypt_lib PUBLIC ${SODIUM_LIBRARIES})

@@ -22,6 +22,9 @@ elseif(APPLE)
 endif()
 
 # ── Dependencies ─────────────────────────────────────────────────────────────
+find_library(SODIUM_LIB sodium REQUIRED
+    HINTS /opt/homebrew/lib /usr/local/lib
+)
 pkg_check_modules(SODIUM REQUIRED libsodium)
 
 # ── Library (shared between main and tests) ───────────────────────────────────

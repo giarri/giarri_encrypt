@@ -22,13 +22,12 @@ elseif(APPLE)
 endif()
 
 # -- Dependencies -------------------------------------------------------------
-pkg_check_modules(SODIUM REQUIRED libsodium)
+pkg_check_modules(SODIUM REQUIRED IMPORTED_TARGET libsodium)
 
 # -- Library (shared between main and tests) -----------------------------------
 add_library(giarri_encrypt_lib STATIC src/crypto.cpp)
 target_include_directories(giarri_encrypt_lib PUBLIC include ${SODIUM_INCLUDE_DIRS})
-target_link_libraries(giarri_encrypt_lib PUBLIC ${SODIUM_LIBRARIES})
-target_compile_options(giarri_encrypt_lib PRIVATE ${SODIUM_CFLAGS_OTHER})
+target_link_libraries(giarri_encrypt_lib PUBLIC PkgConfig::SODIUM)
 
 # ── Main executable ───────────────────────────────────────────────────────────
 add_executable(giarri_encrypt

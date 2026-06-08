@@ -1,7 +1,9 @@
 #include "crypto.hpp"
 
 #include <sodium.h>
-#include <termios.h>
+#ifndef _WIN32
+    #include <termios.h>
+#endif
 #include <unistd.h>
 
 #include <array>
@@ -21,14 +23,28 @@ namespace crypto {
     std::string read_password(const std::string& prompt)
     {
         // Disable echo
-        struct termios old_tty{}, new_tty{};
-        const bool is_tty = (tcgetattr(STDIN_FILENO, &old_tty) == 0);
-        if (is_tty) {
-            new_tty = old_tty;
-            new_tty.c_lflag &= ~static_cast<tcflag_t>(ECHO);
-            tcsetattr(STDIN_FILENO, TCSANOW, &new_tty);
-        }
+        #ifdef _WIN32
+            HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+            DWORD mode = 0;
+            GetConsoleMode(h, &mode);
+            SetConsoleMode(h, mode & ~ENABLE_ECHO_INPUT);
 
+            std::cerr << prompt << std::flush;
+            std::string pw;
+            std::getline(std::cin, pw);
+
+            SetConsoleMode(h, mode);   // restore
+            std::cerr << '\n';
+            return pw;
+        #else
+            struct termios old_tty{}, new_tty{};
+            const bool is_tty = (tcgetattr(STDIN_FILENO, &old_tty) == 0);
+            if (is_tty) {
+                new_tty = old_tty;
+                new_tty.c_lflag &= ~static_cast<tcflag_t>(ECHO);
+                tcsetattr(STDIN_FILENO, TCSANOW, &new_tty);
+            }
+        #endif
         std::cerr << prompt << std::flush;
 
         // Use a libsodium-allocated buffer to prevent swapping

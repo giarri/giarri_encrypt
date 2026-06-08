@@ -27,21 +27,24 @@ jobs:
       - name: Install libsodium (macOS)
         if: runner.os == 'macOS'
         run: brew install libsodium pkg-config
-      
+
       - name: Cache vcpkg
         uses: actions/cache@v4
         if: runner.os == 'Windows'
         with:
-            path: |
-              C:\vcpkg\installed
-              C:\Users\runneradmin\AppData\Local\vcpkg\archives
-            key: vcpkg-${{ runner.os }}-libsodium-1.0.22
-            restore-keys: vcpkg-${{ runner.os }}-
-      
+          path: |
+            C:\vcpkg\installed
+            C:\Users\runneradmin\AppData\Local\vcpkg\archives
+          key: vcpkg-${{ runner.os }}-libsodium-1.0.22
+          restore-keys: vcpkg-${{ runner.os }}-
+
+      - name: Configure vcpkg binary caching
+        if: runner.os == 'Windows'
+        run: echo "VCPKG_BINARY_SOURCES=clear;files,C:\Users\runneradmin\AppData\Local\vcpkg\archives,readwrite" >> $env:GITHUB_ENV
+
       - name: Install libsodium (Windows)
         if: runner.os == 'Windows'
         run: vcpkg install libsodium:x64-windows
-        # Assumes VCPKG_ROOT is set by the runner; windows-latest has vcpkg pre-installed.
 
       # ── Configure ───────────────────────────────────────────────────────────
       - name: Configure (Linux / macOS)
@@ -51,6 +54,7 @@ jobs:
           echo "CMAKE_PREFIX_PATH=$(brew --prefix libsodium)" >> $GITHUB_ENV
           cmake -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+
       - name: Debug libsodium paths
         if: runner.os == 'macOS'
         run: |
@@ -58,7 +62,6 @@ jobs:
           pkg-config --libs --cflags libsodium
           ls $(brew --prefix libsodium)/lib/
 
-                
       - name: Configure (Windows)
         if: runner.os == 'Windows'
         run: |

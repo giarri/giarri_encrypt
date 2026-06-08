@@ -26,7 +26,7 @@ jobs:
         if: runner.os == 'Windows'
         with:
           path: |
-            C:\vcpkg\installed
+            C:\vcpkg
             C:\Users\runneradmin\AppData\Local\vcpkg\archives
           key: vcpkg-${{ runner.os }}-libsodium-1.0.22
           restore-keys: vcpkg-${{ runner.os }}-

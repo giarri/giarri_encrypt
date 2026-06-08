@@ -27,7 +27,17 @@ jobs:
       - name: Install libsodium (macOS)
         if: runner.os == 'macOS'
         run: brew install libsodium pkg-config
-
+      
+      - name: Cache vcpkg
+        uses: actions/cache@v4
+        if: runner.os == 'Windows'
+        with:
+            path: |
+              C:\vcpkg\installed
+              C:\Users\runneradmin\AppData\Local\vcpkg\archives
+            key: vcpkg-${{ runner.os }}-libsodium-1.0.22
+            restore-keys: vcpkg-${{ runner.os }}-
+      
       - name: Install libsodium (Windows)
         if: runner.os == 'Windows'
         run: vcpkg install libsodium:x64-windows
@@ -48,6 +58,7 @@ jobs:
           pkg-config --libs --cflags libsodium
           ls $(brew --prefix libsodium)/lib/
 
+                
       - name: Configure (Windows)
         if: runner.os == 'Windows'
         run: |
@@ -63,3 +74,9 @@ jobs:
       - name: Run tests
         working-directory: build
         run: ctest --build-config ${{ matrix.build_type }} --output-on-failure --parallel 4
+      
+      - name: Cache CMake build deps
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: gtest-1.14.0-${{ runner.os }}

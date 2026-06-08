@@ -7,7 +7,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew")
 
 # Hardening flags
-if(NOT MSVC)
+if(MSVC)
+	add_compile_options(
+		/GS /NXCOMPAT
+	)
+else()
     add_compile_options(
         -Wall -Wextra -Wpedantic
         -fstack-protector-strong

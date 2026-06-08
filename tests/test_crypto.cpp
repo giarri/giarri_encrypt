@@ -12,12 +12,14 @@
     #define NO_TERM
 #else
     #include <termios.h>
-    #include <util.h>
 #endif
 #include <fcntl.h>
 #include <poll.h>
 #include <chrono>
 
+#ifdef __APPLE__
+#  include <util.h>
+#endif
 #include <unistd.h>   // write, close
 #include <thread>
 #include <sstream>

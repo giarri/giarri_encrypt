@@ -3,8 +3,8 @@
 #include <sodium.h>
 #ifndef _WIN32
     #include <termios.h>
+    #include <unistd.h>
 #endif
-#include <unistd.h>
 
 #include <array>
 #include <fstream>
@@ -44,7 +44,6 @@ namespace crypto {
                 new_tty.c_lflag &= ~static_cast<tcflag_t>(ECHO);
                 tcsetattr(STDIN_FILENO, TCSANOW, &new_tty);
             }
-        #endif
         std::cerr << prompt << std::flush;
 
         // Use a libsodium-allocated buffer to prevent swapping
@@ -80,6 +79,7 @@ namespace crypto {
             std::cerr << '\n';
         }
         return pw;
+        #endif
     }
 
 SecureKey derive_key(const std::string& password,

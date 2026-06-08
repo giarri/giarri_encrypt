@@ -29,7 +29,6 @@ jobs:
             C:/vcpkg/
             C:/Users/runneradmin/AppData/Local/vcpkg/archives
             C:/vcpkg/packages/libsodium_x64-windows/share/libsodium
-          # trying another way can't hurt right?
             C:\vcpkg\
             C:\Users\runneradmin\AppData\Local\vcpkg\archives
             C:\vcpkg\packages\libsodium_x64-windows\share\libsodium

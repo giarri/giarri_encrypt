@@ -23,6 +23,7 @@
 #include <unistd.h>   // write, close
 #include <thread>
 #include <sstream>
+#include <cstring>
 
 namespace fs = std::filesystem;
 

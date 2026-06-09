@@ -50,3 +50,5 @@ In some configurations (only test inside CLion) the read password test fails bec
 Password: Assertion failed: (_unprotected_ptr_from_user_ptr(user_ptr) == unprotected_ptr), function _sodium_malloc, file utils.c, line 630.
 ```
 I think it's because the mock tries to incapsulate the read_password / stdin function...
+
+This test was completely removed in the windows build because of the dependencies on pty.h

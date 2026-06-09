@@ -38,8 +38,7 @@ The C++ applications must be built using at least a basic Makefile, but using a 
 ```shell
 mkdir build
 cmake -S . build
-cd build
-make
+cmake --build build
 # example use
 ./giarri_encrypt encrypt ../CMakeLists.txt
 ```

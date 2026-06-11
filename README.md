@@ -36,11 +36,10 @@ The C++ applications must be built using at least a basic Makefile, but using a 
 
 ## BUILD AND RUN
 ```shell
-mkdir build
-cmake -S . build
+cmake -B build
 cmake --build build
 # example use
-./giarri_encrypt encrypt ../CMakeLists.txt
+./build/giarri_encrypt encrypt CMakeLists.txt
 ```
 
 ## Issues I encountered

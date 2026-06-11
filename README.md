@@ -47,6 +47,8 @@ cmake --build build
 cmake -B coverage -DCMAKE_BUILD_TYPE=Coverage
 cmake --build coverage
 cmake --build coverage --target coverage
+```
+[Check out the results](./coverage-to-share/index.html)
 
 ```
 

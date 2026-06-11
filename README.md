@@ -42,6 +42,14 @@ cmake --build build
 ./build/giarri_encrypt encrypt CMakeLists.txt
 ```
 
+## BUILD & COVER 
+```shell
+cmake -B coverage -DCMAKE_BUILD_TYPE=Coverage
+cmake --build coverage
+cmake --build coverage --target coverage
+
+```
+
 ## Issues I encountered
 In some configurations (only test inside CLion) the read password test fails because of the following error:
 ```error

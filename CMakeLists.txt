@@ -29,19 +29,6 @@ endif()
 
 # -- Dependencies -------------------------------------------------------------
 pkg_check_modules(SODIUM REQUIRED IMPORTED_TARGET libsodium)
-
-# -- Library (shared between main and tests) -----------------------------------
-add_library(giarri_encrypt_lib STATIC src/crypto.cpp)
-target_include_directories(giarri_encrypt_lib PUBLIC include ${SODIUM_INCLUDE_DIRS})
-target_link_libraries(giarri_encrypt_lib PUBLIC PkgConfig::SODIUM)
-
-# ── Main executable ───────────────────────────────────────────────────────────
-add_executable(giarri_encrypt
-		src/main.cpp
-		include/logging.hpp)
-target_link_libraries(giarri_encrypt PRIVATE giarri_encrypt_lib)
-
-# ── Test executable ───────────────────────────────────────────────────────────
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -52,16 +39,23 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-add_executable(giarri_encrypt_tests tests/test_crypto.cpp)
-target_link_libraries(giarri_encrypt_tests PRIVATE
-	giarri_encrypt_lib
-	GTest::gtest
-	GTest::gtest_main
-)
-if(UNIX AND NOT APPLE)
-    target_link_libraries(giarri_encrypt_tests PRIVATE util)
+# Tests
+include(CTest)
+include(GoogleTest)
+enable_testing()
+
+# Add a custom target for generating coverage-to-share reports
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Coverage") # Check if the build type is 'Coverage'
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)  # Required for gcovr
+    add_custom_target(coverage
+            COMMAND ${CMAKE_COMMAND} -E make_directory coverage
+            COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+            COMMAND ${Python3_EXECUTABLE} -m gcovr -r ${CMAKE_SOURCE_DIR} --html --html-nested -o coverage/index.html
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            COMMENT "Generating HTML coverage report..."
+    )
 endif()
 
-enable_testing()
-include(GoogleTest)
-gtest_discover_tests(giarri_encrypt_tests)
+# Add subdirectories
+add_subdirectory(src)
+add_subdirectory(tests)

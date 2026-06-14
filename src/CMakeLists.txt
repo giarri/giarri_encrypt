@@ -1,3 +1,4 @@
+# src/CMakeLists.txt
 # Set the compiler flags on the Coverage build-type
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_C_FLAGS_COVERAGE "${CMAKE_C_FLAGS_DEBUG} --coverage")

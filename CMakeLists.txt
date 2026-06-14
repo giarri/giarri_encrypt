@@ -59,6 +59,8 @@ endif()
 
 # Move executables to the root of the build directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})  # ← import libs (.lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})  # ← .so on Unix
 
 # Add subdirectories
 add_subdirectory(src)

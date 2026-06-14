@@ -50,6 +50,11 @@ cmake --build coverage --target coverage
 ```
 [Check out the results](./coverage-to-share/index.html)
 
+## BUILD AND FUZZ
+```shell
+cd build-afl
+cmake -DCMAKE_C_COMPILER=afl-cc -DCMAKE_CXX_COMPILER=afl-c++  -DCMAKE_C_FLAGS="-fsanitize=address,undefined -fno-sanitize-recover=all -g" -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined -fno-sanitize-recover=all" -DCMAKE_MODULE_LINKER_FLAGS="-fsanitize=address,undefined -fno-sanitize-recover=all" -DCMAKE_BUILD_TYPE=Debug,ASAN,UBSAN -DBUILD_SHARED_LIBS=OFF ..
+make
 ```
 
 ## Issues I encountered

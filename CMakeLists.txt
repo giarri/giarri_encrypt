@@ -8,9 +8,7 @@ list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew")
 
 # Hardening flags
 if(MSVC)
-	add_compile_options(
-		/GS /NXCOMPAT
-	)
+	add_compile_options(/GS)
 else()
     add_compile_options(
         -Wall -Wextra -Wpedantic
@@ -20,14 +18,17 @@ else()
     )
 endif()
 
-find_package(PkgConfig REQUIRED)
-if(UNIX AND NOT APPLE)
-    add_link_options(-Wl,-z,relro,-z,now)
+if(MSVC)
+    add_link_options(/NXCOMPAT)
 elseif(APPLE)
-    add_link_options(-Wl)
+    add_link_options(-Wl, -pie)
+elseif(UNIX)
+    add_link_options(-Wl,-z,relro,-z,now)
 endif()
 
 # -- Dependencies -------------------------------------------------------------
+find_package(PkgConfig REQUIRED)
+
 pkg_check_modules(SODIUM REQUIRED IMPORTED_TARGET libsodium)
 include(FetchContent)
 FetchContent_Declare(
@@ -55,6 +56,9 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Coverage") # Check if the build type is 'Cov
             COMMENT "Generating HTML coverage report..."
     )
 endif()
+
+# Move executables to the root of the build directory
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/..)
 
 # Add subdirectories
 add_subdirectory(src)

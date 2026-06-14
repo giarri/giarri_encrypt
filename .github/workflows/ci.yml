@@ -29,9 +29,6 @@ jobs:
             C:/vcpkg/
             C:/Users/runneradmin/AppData/Local/vcpkg/archives
             C:/vcpkg/packages/libsodium_x64-windows/share/libsodium
-            C:\vcpkg\
-            C:\Users\runneradmin\AppData\Local\vcpkg\archives
-            C:\vcpkg\packages\libsodium_x64-windows\share\libsodium
           key: vcpkg-${{ runner.os }}-libsodium-1.0.22
           restore-keys: vcpkg-${{ runner.os }}-
 
@@ -40,8 +37,7 @@ jobs:
         run: echo "VCPKG_BINARY_SOURCES=clear;files,C:\Users\runneradmin\AppData\Local\vcpkg\archives,readwrite" >> $env:GITHUB_ENV
 
       - name: Install libsodium (Windows)
-        if: runner.os == 'Windows' &&
-            steps.cache-vpkg.outputs.cache-hit != 'true'
+        if: runner.os == 'Windows'
         run: vcpkg install libsodium:x64-windows
 
       - name: Install libsodium (Linux)

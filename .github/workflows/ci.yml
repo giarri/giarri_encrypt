@@ -38,7 +38,7 @@ jobs:
 
       - name: Install libsodium (Windows)
         if: runner.os == 'Windows'
-        run: vcpkg install libsodium:x64-windows
+        run: vcpkg install libsodium
 
       - name: Install libsodium (Linux)
         if: runner.os == 'Linux'

@@ -58,7 +58,7 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Coverage") # Check if the build type is 'Cov
 endif()
 
 # Move executables to the root of the build directory
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/..)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # Add subdirectories
 add_subdirectory(src)

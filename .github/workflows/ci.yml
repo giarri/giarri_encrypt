@@ -16,26 +16,7 @@ jobs:
         build_type: [Release]
 
     steps:
-      # ── Checkout ────────────────────────────────────────────────────────────
       - uses: actions/checkout@v6
-
-      # ── Dependencies ────────────────────────────────────────────────────────
-      - name: Cache vcpkg
-        uses: actions/cache@v5
-        id: cache-vcpkg
-        if: runner.os == 'Windows'
-        with:
-          path: |
-            C:/vcpkg/
-            C:/Users/runneradmin/AppData/Local/vcpkg/archives
-            C:/vcpkg/packages/libsodium_x64-windows/share/libsodium
-          key: vcpkg-${{ runner.os }}-libsodium-1.0.22
-          restore-keys: vcpkg-${{ runner.os }}-
-
-      - name: Configure vcpkg binary caching
-        if: runner.os == 'Windows'
-        run: echo "VCPKG_BINARY_SOURCES=clear;files,C:\Users\runneradmin\AppData\Local\vcpkg\archives,readwrite" >> $env:GITHUB_ENV
-
       - name: Install libsodium (Windows)
         if: runner.os == 'Windows'
         run: vcpkg install libsodium
@@ -52,7 +33,6 @@ jobs:
           key: gtest-1.14.0-${{ runner.os }}
           restore-keys: gtest-${{ runner.os }}-
 
-
       # ── Configure ───────────────────────────────────────────────────────────
       - name: Configure (macOS)
         if: runner.os == 'macOS'
@@ -60,11 +40,11 @@ jobs:
           echo "PKG_CONFIG_PATH=$(brew --prefix libsodium)/lib/pkgconfig" >> $GITHUB_ENV
           echo "CMAKE_PREFIX_PATH=$(brew --prefix libsodium)" >> $GITHUB_ENV
 
-      - name: Configure (Linux / macOS)
+      - name: cmake build (Linux / macOS)
         if: runner.os != 'Windows'
         run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
-      - name: Configure (Windows)
+      - name: cmake build (Windows)
         if: runner.os == 'Windows'
         run: |
           cmake -B build `

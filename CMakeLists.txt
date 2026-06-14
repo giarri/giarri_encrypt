@@ -40,23 +40,6 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# Tests
-include(CTest)
-include(GoogleTest)
-enable_testing()
-
-# Add a custom target for generating coverage-to-share reports
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Coverage") # Check if the build type is 'Coverage'
-    find_package(Python3 REQUIRED COMPONENTS Interpreter)  # Required for gcovr
-    add_custom_target(coverage
-            COMMAND ${CMAKE_COMMAND} -E make_directory coverage
-            COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
-            COMMAND ${Python3_EXECUTABLE} -m gcovr -r ${CMAKE_SOURCE_DIR} --html --html-nested -o coverage/index.html
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            COMMENT "Generating HTML coverage report..."
-    )
-endif()
-
 # Move executables to the root of the build directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})  # ← import libs (.lib)
